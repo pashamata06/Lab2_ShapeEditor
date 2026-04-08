@@ -344,11 +344,9 @@ public class DrawingCanvas : Control
         if (_isDragging && _activeHandle != ResizeHandle.None && _selectedShapes.Count == 1)
         {
             var shape = _selectedShapes[0];
-            // Вычисляем дельту относительно предыдущей точки
             double deltaX = currentPoint.X - _lastResizePoint.X;
             double deltaY = currentPoint.Y - _lastResizePoint.Y;
             
-            // Коэффициенты масштабирования (относительные)
             double sx = 1, sy = 1;
             double width = _selectedShapeBounds.Width;
             double height = _selectedShapeBounds.Height;
@@ -389,13 +387,11 @@ public class DrawingCanvas : Control
                     break;
             }
             
-            // Ограничиваем минимальный размер (не даём уменьшиться меньше 10)
             if (width * sx < 10) sx = 10 / width;
             if (height * sy < 10) sy = 10 / height;
             
             shape.Scale(sx, sy, _scaleCenter);
             
-            // Обновляем начальные границы и точку для следующего шага
             _selectedShapeBounds = shape.Bounds;
             _lastResizePoint = currentPoint;
             InvalidateVisual();

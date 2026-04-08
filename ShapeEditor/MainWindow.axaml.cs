@@ -248,7 +248,6 @@ public partial class MainWindow : Window
             };
         }
         
-        // Цвет линии
         if (strokeColorBox != null)
         {
             strokeColorBox.SelectionChanged += (s, e) =>
@@ -278,7 +277,6 @@ public partial class MainWindow : Window
             };
         }
         
-        // Цвет заливки (те же цвета + прозрачный)
         if (fillColorBox != null)
         {
             fillColorBox.SelectionChanged += (s, e) =>
