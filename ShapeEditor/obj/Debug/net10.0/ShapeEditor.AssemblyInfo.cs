@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ShapeEditor")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+da7845ea6b3c1a4ae37342aee8236c2ffa268097")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7ff9409d66113c5b2649d31987fb3ed2dd47a0f8")]
 [assembly: System.Reflection.AssemblyProductAttribute("ShapeEditor")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ShapeEditor")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
