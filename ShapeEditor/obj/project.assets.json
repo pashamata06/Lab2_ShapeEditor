@@ -107,6 +107,23 @@
           "buildTransitive/Avalonia.BuildServices.targets": {}
         }
       },
+      "Avalonia.Controls.ColorPicker/12.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Avalonia": "12.0.0",
+          "Avalonia.Remote.Protocol": "12.0.0"
+        },
+        "compile": {
+          "lib/net10.0/Avalonia.Controls.ColorPicker.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/Avalonia.Controls.ColorPicker.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Avalonia.Desktop/12.0.0": {
         "type": "package",
         "dependencies": {
@@ -834,6 +851,22 @@
         "tools/netstandard2.0/runtimeconfig.json"
       ]
     },
+    "Avalonia.Controls.ColorPicker/12.0.0": {
+      "sha512": "WxY2FpFv8Dq9FhOJy+Pufc5D63RrAITZNZxazTw/sOhqg0eutCXkFs+D8LweYjDeYzdCSajSmkyTnkqExgtQrQ==",
+      "type": "package",
+      "path": "avalonia.controls.colorpicker/12.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "avalonia.controls.colorpicker.12.0.0.nupkg.sha512",
+        "avalonia.controls.colorpicker.nuspec",
+        "lib/net10.0/Avalonia.Controls.ColorPicker.dll",
+        "lib/net10.0/Avalonia.Controls.ColorPicker.xml",
+        "lib/net8.0/Avalonia.Controls.ColorPicker.dll",
+        "lib/net8.0/Avalonia.Controls.ColorPicker.xml"
+      ]
+    },
     "Avalonia.Desktop/12.0.0": {
       "sha512": "vBV72rXx7BxGyxake4u7PbUefrzaOGshcNaqYoBwGLJG94aqExLTpF8mkMKkuZaGu2wLwBSl9ypXANd0PPV2uw==",
       "type": "package",
@@ -1540,6 +1573,7 @@
   "projectFileDependencyGroups": {
     "net10.0": [
       "Avalonia >= 12.0.0",
+      "Avalonia.Controls.ColorPicker >= 12.0.0",
       "Avalonia.Desktop >= 12.0.0",
       "Avalonia.Fonts.Inter >= 12.0.0",
       "Avalonia.Themes.Fluent >= 12.0.0",
@@ -1591,6 +1625,10 @@
         "targetAlias": "net10.0",
         "dependencies": {
           "Avalonia": {
+            "target": "Package",
+            "version": "[12.0.0, )"
+          },
+          "Avalonia.Controls.ColorPicker": {
             "target": "Package",
             "version": "[12.0.0, )"
           },

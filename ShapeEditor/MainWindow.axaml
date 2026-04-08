@@ -6,7 +6,6 @@
         Width="1500"
         Height="700">
     <DockPanel>
-        <!-- Верхняя панель инструментов -->
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5" Spacing="10">
             <Button x:Name="SelectBtn" Width="70">Выделить</Button>
             <Button x:Name="LineBtn" Width="80">Отрезок</Button>
@@ -21,10 +20,16 @@
             
             <TextBlock Text="Цвет линии:" VerticalAlignment="Center" Margin="20,0,5,0"/>
             <ComboBox x:Name="StrokeColorBox" Width="100" SelectedIndex="0">
-                <ComboBoxItem Tag="Black">Черный</ComboBoxItem>
-                <ComboBoxItem Tag="Red">Красный</ComboBoxItem>
-                <ComboBoxItem Tag="Blue">Синий</ComboBoxItem>
-                <ComboBoxItem Tag="Green">Зеленый</ComboBoxItem>
+                <ComboBoxItem>Черный</ComboBoxItem>
+                <ComboBoxItem>Красный</ComboBoxItem>
+                <ComboBoxItem>Синий</ComboBoxItem>
+                <ComboBoxItem>Зеленый</ComboBoxItem>
+                <ComboBoxItem>Желтый</ComboBoxItem>
+                <ComboBoxItem>Оранжевый</ComboBoxItem>
+                <ComboBoxItem>Фиолетовый</ComboBoxItem>
+                <ComboBoxItem>Коричневый</ComboBoxItem>
+                <ComboBoxItem>Розовый</ComboBoxItem>
+                <ComboBoxItem>Голубой</ComboBoxItem>
             </ComboBox>
             
             <TextBlock Text="Толщина:" VerticalAlignment="Center" Margin="10,0,5,0"/>
@@ -34,14 +39,20 @@
             
             <TextBlock Text="Заливка:" VerticalAlignment="Center" Margin="10,0,5,0"/>
             <ComboBox x:Name="FillColorBox" Width="100" SelectedIndex="0">
-                <ComboBoxItem Tag="Transparent">Нет</ComboBoxItem>
-                <ComboBoxItem Tag="Yellow">Желтый</ComboBoxItem>
-                <ComboBoxItem Tag="LightBlue">Голубой</ComboBoxItem>
-                <ComboBoxItem Tag="LightGreen">Светло-зеленый</ComboBoxItem>
+                <ComboBoxItem>Прозрачный</ComboBoxItem>
+                <ComboBoxItem>Черный</ComboBoxItem>
+                <ComboBoxItem>Красный</ComboBoxItem>
+                <ComboBoxItem>Синий</ComboBoxItem>
+                <ComboBoxItem>Зеленый</ComboBoxItem>
+                <ComboBoxItem>Желтый</ComboBoxItem>
+                <ComboBoxItem>Оранжевый</ComboBoxItem>
+                <ComboBoxItem>Фиолетовый</ComboBoxItem>
+                <ComboBoxItem>Коричневый</ComboBoxItem>
+                <ComboBoxItem>Розовый</ComboBoxItem>
+                <ComboBoxItem>Голубой</ComboBoxItem>
             </ComboBox>
         </StackPanel>
         
-        <!-- Основная область: холст + панель слоёв -->
         <DockPanel>
             <StackPanel DockPanel.Dock="Right" Width="260" Background="LightGray" Margin="5,0,0,0">
                 <TextBlock Text="Слои" FontWeight="Bold" Margin="5" HorizontalAlignment="Center"/>

@@ -21,17 +21,13 @@ public class EllipseShape : ShapeBase
         var brush = new SolidColorBrush(FillColor);
         var pen = new Pen(new SolidColorBrush(StrokeColor), StrokeThickness);
         
-        // Создаём геометрию эллипса
         var geometry = new StreamGeometry();
         using (var ctx = geometry.Open())
         {
             var center = new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
             double rx = rect.Width / 2;
             double ry = rect.Height / 2;
-            
-            // Аппроксимация эллипса через кубические кривые Безье
             double c = 0.5522847498;
-            
             var points = new[]
             {
                 new Point(center.X + rx, center.Y),
@@ -47,7 +43,6 @@ public class EllipseShape : ShapeBase
                 new Point(center.X + rx * c, center.Y - ry),
                 new Point(center.X + rx, center.Y - ry * c)
             };
-            
             ctx.BeginFigure(points[0], true);
             ctx.CubicBezierTo(points[1], points[2], points[3]);
             ctx.CubicBezierTo(points[4], points[5], points[6]);
@@ -67,12 +62,9 @@ public class EllipseShape : ShapeBase
         var center = new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
         double rx = rect.Width / 2;
         double ry = rect.Height / 2;
-        
         if (rx == 0 || ry == 0) return false;
-        
         double dx = (point.X - center.X) / rx;
         double dy = (point.Y - center.Y) / ry;
-        
         return dx * dx + dy * dy <= 1;
     }
     
@@ -106,11 +98,15 @@ public class EllipseShape : ShapeBase
                 center.Y + dx * sin + dy * cos
             );
         }
-        
         var oldTopLeft = RotatePoint(TopLeft);
         var oldBottomRight = RotatePoint(BottomRight);
-        
         TopLeft = new Point(Math.Min(oldTopLeft.X, oldBottomRight.X), Math.Min(oldTopLeft.Y, oldBottomRight.Y));
         BottomRight = new Point(Math.Max(oldTopLeft.X, oldBottomRight.X), Math.Max(oldTopLeft.Y, oldBottomRight.Y));
+    }
+    
+    public override void Scale(double sx, double sy, Point center)
+    {
+        TopLeft = new Point(center.X + (TopLeft.X - center.X) * sx, center.Y + (TopLeft.Y - center.Y) * sy);
+        BottomRight = new Point(center.X + (BottomRight.X - center.X) * sx, center.Y + (BottomRight.Y - center.Y) * sy);
     }
 }

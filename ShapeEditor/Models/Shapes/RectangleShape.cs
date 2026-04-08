@@ -32,10 +32,8 @@ public class RectangleShape : ShapeBase
         double rad = angle * Math.PI / 180;
         double cos = Math.Cos(rad);
         double sin = Math.Sin(rad);
-        
         double dx = p.X - center.X;
         double dy = p.Y - center.Y;
-        
         return new Point(
             center.X + dx * cos - dy * sin,
             center.Y + dx * sin + dy * cos
@@ -57,11 +55,8 @@ public class RectangleShape : ShapeBase
     {
         var corners = GetCorners();
         var rotatedCorners = new List<Point>();
-        
         foreach (var corner in corners)
-        {
             rotatedCorners.Add(RotatePoint(corner, _center, _rotationAngle));
-        }
         
         var geometry = new StreamGeometry();
         using (var ctx = geometry.Open())
@@ -72,10 +67,8 @@ public class RectangleShape : ShapeBase
             ctx.LineTo(rotatedCorners[3]);
             ctx.EndFigure(true);
         }
-        
         var brush = new SolidColorBrush(FillColor);
         var pen = new Pen(new SolidColorBrush(StrokeColor), StrokeThickness);
-        
         if (FillColor != Colors.Transparent)
             context.DrawGeometry(brush, null, geometry);
         context.DrawGeometry(null, pen, geometry);
@@ -85,15 +78,10 @@ public class RectangleShape : ShapeBase
     {
         var corners = GetCorners();
         var rotatedCorners = new List<Point>();
-        
         foreach (var corner in corners)
-        {
             rotatedCorners.Add(RotatePoint(corner, _center, _rotationAngle));
-        }
-        
         double minX = double.MaxValue, minY = double.MaxValue;
         double maxX = double.MinValue, maxY = double.MinValue;
-        
         foreach (var p in rotatedCorners)
         {
             minX = Math.Min(minX, p.X);
@@ -101,7 +89,6 @@ public class RectangleShape : ShapeBase
             maxX = Math.Max(maxX, p.X);
             maxY = Math.Max(maxY, p.Y);
         }
-        
         var bounds = new Rect(minX, minY, maxX - minX, maxY - minY);
         return bounds.Contains(point);
     }
@@ -112,15 +99,10 @@ public class RectangleShape : ShapeBase
         {
             var corners = GetCorners();
             var rotatedCorners = new List<Point>();
-            
             foreach (var corner in corners)
-            {
                 rotatedCorners.Add(RotatePoint(corner, _center, _rotationAngle));
-            }
-            
             double minX = double.MaxValue, minY = double.MaxValue;
             double maxX = double.MinValue, maxY = double.MinValue;
-            
             foreach (var p in rotatedCorners)
             {
                 minX = Math.Min(minX, p.X);
@@ -128,7 +110,6 @@ public class RectangleShape : ShapeBase
                 maxX = Math.Max(maxX, p.X);
                 maxY = Math.Max(maxY, p.Y);
             }
-            
             return new Rect(minX, minY, maxX - minX, maxY - minY);
         }
     }
@@ -151,6 +132,13 @@ public class RectangleShape : ShapeBase
     public override void Rotate(double angle, Point center)
     {
         _rotationAngle += angle;
+        UpdateCenter();
+    }
+    
+    public override void Scale(double sx, double sy, Point center)
+    {
+        TopLeft = new Point(center.X + (TopLeft.X - center.X) * sx, center.Y + (TopLeft.Y - center.Y) * sy);
+        BottomRight = new Point(center.X + (BottomRight.X - center.X) * sx, center.Y + (BottomRight.Y - center.Y) * sy);
         UpdateCenter();
     }
 }

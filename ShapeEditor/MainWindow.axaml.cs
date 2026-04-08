@@ -123,7 +123,7 @@ public partial class MainWindow : Window
                 {
                     textBox.LostFocus += (s, e) =>
                     {
-                        layer.Name = textBox.Text;
+                        layer.Name = textBox.Text ?? "";
                         UpdateLayersList();
                     };
                 }
@@ -161,16 +161,13 @@ public partial class MainWindow : Window
                 {
                     var shapesToDelete = activeLayer.Shapes.ToList();
                     foreach (var shape in shapesToDelete)
-                    {
                         canvas.RemoveShape(shape);
-                    }
                     canvas.RemoveLayer(activeLayer);
                     UpdateLayersList();
                 }
             };
         }
         
-        // Вверх - поднимаем слой выше (ближе к верху списка)
         if (moveLayerUpBtn != null && canvas != null)
         {
             moveLayerUpBtn.Click += (s, e) =>
@@ -184,7 +181,6 @@ public partial class MainWindow : Window
             };
         }
         
-        // Вниз - опускаем слой ниже (ближе к низу списка)
         if (moveLayerDownBtn != null && canvas != null)
         {
             moveLayerDownBtn.Click += (s, e) =>
@@ -245,7 +241,6 @@ public partial class MainWindow : Window
                 if (e.Key == Key.Enter && canvas != null && double.TryParse(thicknessInput.Text, out double value))
                     UpdateThickness(value);
             };
-            
             thicknessInput.LostFocus += (s, e) =>
             {
                 if (canvas != null && double.TryParse(thicknessInput.Text, out double value))
@@ -253,20 +248,28 @@ public partial class MainWindow : Window
             };
         }
         
+        // Цвет линии
         if (strokeColorBox != null)
         {
             strokeColorBox.SelectionChanged += (s, e) =>
             {
                 if (canvas == null) return;
-                var item = strokeColorBox.SelectedItem as ComboBoxItem;
-                if (item != null)
+                var selected = strokeColorBox.SelectedItem as ComboBoxItem;
+                if (selected != null)
                 {
-                    var color = item.Tag?.ToString() switch
+                    var colorName = selected.Content as string;
+                    var color = colorName switch
                     {
-                        "Black" => Colors.Black,
-                        "Red" => Colors.Red,
-                        "Blue" => Colors.Blue,
-                        "Green" => Colors.Green,
+                        "Черный" => Colors.Black,
+                        "Красный" => Colors.Red,
+                        "Синий" => Colors.Blue,
+                        "Зеленый" => Colors.Green,
+                        "Желтый" => Colors.Yellow,
+                        "Оранжевый" => Colors.Orange,
+                        "Фиолетовый" => Colors.Purple,
+                        "Коричневый" => Colors.Brown,
+                        "Розовый" => Colors.Pink,
+                        "Голубой" => Colors.LightBlue,
                         _ => Colors.Black
                     };
                     canvas.CurrentStrokeColor = color;
@@ -275,20 +278,29 @@ public partial class MainWindow : Window
             };
         }
         
+        // Цвет заливки (те же цвета + прозрачный)
         if (fillColorBox != null)
         {
             fillColorBox.SelectionChanged += (s, e) =>
             {
                 if (canvas == null) return;
-                var item = fillColorBox.SelectedItem as ComboBoxItem;
-                if (item != null)
+                var selected = fillColorBox.SelectedItem as ComboBoxItem;
+                if (selected != null)
                 {
-                    var color = item.Tag?.ToString() switch
+                    var colorName = selected.Content as string;
+                    var color = colorName switch
                     {
-                        "Transparent" => Colors.Transparent,
-                        "Yellow" => Colors.Yellow,
-                        "LightBlue" => Colors.LightBlue,
-                        "LightGreen" => Colors.LightGreen,
+                        "Прозрачный" => Colors.Transparent,
+                        "Черный" => Colors.Black,
+                        "Красный" => Colors.Red,
+                        "Синий" => Colors.Blue,
+                        "Зеленый" => Colors.Green,
+                        "Желтый" => Colors.Yellow,
+                        "Оранжевый" => Colors.Orange,
+                        "Фиолетовый" => Colors.Purple,
+                        "Коричневый" => Colors.Brown,
+                        "Розовый" => Colors.Pink,
+                        "Голубой" => Colors.LightBlue,
                         _ => Colors.Transparent
                     };
                     canvas.CurrentFillColor = color;

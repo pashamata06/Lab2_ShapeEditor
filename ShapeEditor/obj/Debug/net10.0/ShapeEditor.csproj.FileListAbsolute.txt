@@ -87,3 +87,5 @@
 /Users/mac/Desktop/Lab2_ShapeEditor/ShapeEditor/obj/Debug/net10.0/ShapeEditor.pdb
 /Users/mac/Desktop/Lab2_ShapeEditor/ShapeEditor/obj/Debug/net10.0/ShapeEditor.genruntimeconfig.cache
 /Users/mac/Desktop/Lab2_ShapeEditor/ShapeEditor/obj/Debug/net10.0/ref/ShapeEditor.dll
+/Users/mac/Desktop/Lab2_ShapeEditor/ShapeEditor/obj/Debug/net10.0/ShapeEditor.sourcelink.json
+/Users/mac/Desktop/Lab2_ShapeEditor/ShapeEditor/bin/Debug/net10.0/Avalonia.Controls.ColorPicker.dll

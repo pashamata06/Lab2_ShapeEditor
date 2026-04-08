@@ -33,7 +33,6 @@ public class LineShape : ShapeBase
         double ay = b.Y - a.Y;
         double t = ((p.X - a.X) * ax + (p.Y - a.Y) * ay) / (ax * ax + ay * ay);
         t = Math.Clamp(t, 0, 1);
-        
         double dx = a.X + t * ax - p.X;
         double dy = a.Y + t * ay - p.Y;
         return Math.Sqrt(dx * dx + dy * dy);
@@ -69,8 +68,13 @@ public class LineShape : ShapeBase
                 center.Y + dx * sin + dy * cos
             );
         }
-        
         Start = RotatePoint(Start);
         End = RotatePoint(End);
+    }
+    
+    public override void Scale(double sx, double sy, Point center)
+    {
+        Start = new Point(center.X + (Start.X - center.X) * sx, center.Y + (Start.Y - center.Y) * sy);
+        End = new Point(center.X + (End.X - center.X) * sx, center.Y + (End.Y - center.Y) * sy);
     }
 }

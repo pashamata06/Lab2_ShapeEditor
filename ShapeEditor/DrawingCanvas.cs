@@ -30,9 +30,9 @@ public class DrawingCanvas : Control
     
     private enum ResizeHandle { None, TopLeft, Top, TopRight, Right, BottomRight, Bottom, BottomLeft, Left }
     private ResizeHandle _activeHandle = ResizeHandle.None;
-    private Rect _selectedShapeBounds;
-    private Point _oldTopLeft;
-    private Point _oldBottomRight;
+    private Rect _selectedShapeBounds;   // исходные границы при начале изменения размера
+    private Point _scaleCenter;           // центр для масштабирования
+    private Point _lastResizePoint;       // последняя точка мыши при изменении размера
     
     private PolylineShape? _currentPolyline;
     private bool _isDrawingPolyline;
@@ -119,7 +119,9 @@ public class DrawingCanvas : Control
     public void AddShape(IShape shape)
     {
         if (_activeLayer != null)
+        {
             _activeLayer.Shapes.Add(shape);
+        }
         InvalidateVisual();
     }
     
@@ -219,7 +221,7 @@ public class DrawingCanvas : Control
         foreach (var shape in _selectedShapes)
             DrawSelectionFrame(context, shape.Bounds);
         
-        if (_selectedShapes.Count == 1 && _selectedShapes[0] is RectangleShape)
+        if (_selectedShapes.Count == 1)
             DrawResizeHandles(context, _selectedShapes[0].Bounds);
         
         if (_previewShape != null && CurrentShapeType != ShapeType.Polyline && CurrentShapeType != ShapeType.Polygon && CurrentShapeType != ShapeType.Select)
@@ -232,16 +234,17 @@ public class DrawingCanvas : Control
         var clickPoint = e.GetPosition(this);
         var isShiftPressed = (e.KeyModifiers & KeyModifiers.Shift) != 0;
         
-        if (_selectedShapes.Count == 1 && _selectedShapes[0] is RectangleShape rect && CurrentShapeType == ShapeType.Select)
+        if (_selectedShapes.Count == 1 && CurrentShapeType == ShapeType.Select)
         {
-            _activeHandle = HitTestResizeHandle(clickPoint, rect.Bounds);
+            _activeHandle = HitTestResizeHandle(clickPoint, _selectedShapes[0].Bounds);
             if (_activeHandle != ResizeHandle.None)
             {
-                _selectedShapeBounds = rect.Bounds;
-                _oldTopLeft = rect.TopLeft;
-                _oldBottomRight = rect.BottomRight;
+                _selectedShapeBounds = _selectedShapes[0].Bounds;
+                _scaleCenter = new Point(_selectedShapeBounds.X + _selectedShapeBounds.Width / 2,
+                                         _selectedShapeBounds.Y + _selectedShapeBounds.Height / 2);
                 _isDragging = true;
                 _dragStartPoint = clickPoint;
+                _lastResizePoint = clickPoint;
                 return;
             }
         }
@@ -338,50 +341,63 @@ public class DrawingCanvas : Control
     {
         var currentPoint = e.GetPosition(this);
         
-        if (_isDragging && _activeHandle != ResizeHandle.None && _selectedShapes.Count == 1 && _selectedShapes[0] is RectangleShape rect)
+        if (_isDragging && _activeHandle != ResizeHandle.None && _selectedShapes.Count == 1)
         {
-            double deltaX = currentPoint.X - _dragStartPoint.X;
-            double deltaY = currentPoint.Y - _dragStartPoint.Y;
-            Rect newBounds = _selectedShapeBounds;
+            var shape = _selectedShapes[0];
+            // Вычисляем дельту относительно предыдущей точки
+            double deltaX = currentPoint.X - _lastResizePoint.X;
+            double deltaY = currentPoint.Y - _lastResizePoint.Y;
+            
+            // Коэффициенты масштабирования (относительные)
+            double sx = 1, sy = 1;
+            double width = _selectedShapeBounds.Width;
+            double height = _selectedShapeBounds.Height;
+            
             switch (_activeHandle)
             {
                 case ResizeHandle.TopLeft:
-                    newBounds = new Rect(_selectedShapeBounds.X + deltaX, _selectedShapeBounds.Y + deltaY,
-                                         _selectedShapeBounds.Width - deltaX, _selectedShapeBounds.Height - deltaY);
+                    sx = (width - deltaX) / width;
+                    sy = (height - deltaY) / height;
                     break;
                 case ResizeHandle.Top:
-                    newBounds = new Rect(_selectedShapeBounds.X, _selectedShapeBounds.Y + deltaY,
-                                         _selectedShapeBounds.Width, _selectedShapeBounds.Height - deltaY);
+                    sx = 1;
+                    sy = (height - deltaY) / height;
                     break;
                 case ResizeHandle.TopRight:
-                    newBounds = new Rect(_selectedShapeBounds.X, _selectedShapeBounds.Y + deltaY,
-                                         _selectedShapeBounds.Width + deltaX, _selectedShapeBounds.Height - deltaY);
+                    sx = (width + deltaX) / width;
+                    sy = (height - deltaY) / height;
                     break;
                 case ResizeHandle.Right:
-                    newBounds = new Rect(_selectedShapeBounds.X, _selectedShapeBounds.Y,
-                                         _selectedShapeBounds.Width + deltaX, _selectedShapeBounds.Height);
+                    sx = (width + deltaX) / width;
+                    sy = 1;
                     break;
                 case ResizeHandle.BottomRight:
-                    newBounds = new Rect(_selectedShapeBounds.X, _selectedShapeBounds.Y,
-                                         _selectedShapeBounds.Width + deltaX, _selectedShapeBounds.Height + deltaY);
+                    sx = (width + deltaX) / width;
+                    sy = (height + deltaY) / height;
                     break;
                 case ResizeHandle.Bottom:
-                    newBounds = new Rect(_selectedShapeBounds.X, _selectedShapeBounds.Y,
-                                         _selectedShapeBounds.Width, _selectedShapeBounds.Height + deltaY);
+                    sx = 1;
+                    sy = (height + deltaY) / height;
                     break;
                 case ResizeHandle.BottomLeft:
-                    newBounds = new Rect(_selectedShapeBounds.X + deltaX, _selectedShapeBounds.Y,
-                                         _selectedShapeBounds.Width - deltaX, _selectedShapeBounds.Height + deltaY);
+                    sx = (width - deltaX) / width;
+                    sy = (height + deltaY) / height;
                     break;
                 case ResizeHandle.Left:
-                    newBounds = new Rect(_selectedShapeBounds.X + deltaX, _selectedShapeBounds.Y,
-                                         _selectedShapeBounds.Width - deltaX, _selectedShapeBounds.Height);
+                    sx = (width - deltaX) / width;
+                    sy = 1;
                     break;
             }
-            if (newBounds.Width < 10) newBounds = new Rect(newBounds.X, newBounds.Y, 10, newBounds.Height);
-            if (newBounds.Height < 10) newBounds = new Rect(newBounds.X, newBounds.Y, newBounds.Width, 10);
-            rect.TopLeft = new Point(newBounds.X, newBounds.Y);
-            rect.BottomRight = new Point(newBounds.X + newBounds.Width, newBounds.Y + newBounds.Height);
+            
+            // Ограничиваем минимальный размер (не даём уменьшиться меньше 10)
+            if (width * sx < 10) sx = 10 / width;
+            if (height * sy < 10) sy = 10 / height;
+            
+            shape.Scale(sx, sy, _scaleCenter);
+            
+            // Обновляем начальные границы и точку для следующего шага
+            _selectedShapeBounds = shape.Bounds;
+            _lastResizePoint = currentPoint;
             InvalidateVisual();
             return;
         }
@@ -422,11 +438,6 @@ public class DrawingCanvas : Control
     {
         if (CurrentShapeType == ShapeType.Select)
         {
-            if (_isDragging && _activeHandle != ResizeHandle.None && _selectedShapes.Count == 1 && _selectedShapes[0] is RectangleShape rect)
-            {
-                var command = new ResizeShapeCommand(rect, _oldTopLeft, _oldBottomRight, rect.TopLeft, rect.BottomRight);
-                ExecuteCommand(command);
-            }
             _isDragging = false;
             _activeHandle = ResizeHandle.None;
             return;
@@ -448,7 +459,7 @@ public class DrawingCanvas : Control
         newShape.StrokeColor = CurrentStrokeColor;
         newShape.StrokeThickness = CurrentStrokeThickness;
         newShape.FillColor = CurrentFillColor;
-        ExecuteCommand(new AddShapeCommand(this, newShape));
+        AddShape(newShape);
         _previewShape = null;
         _drawStartPoint = null;
         InvalidateVisual();
@@ -474,7 +485,11 @@ public class DrawingCanvas : Control
             if (e.Key == Key.Enter)
             {
                 if (_currentPolyline.Points.Count >= 2)
-                    ExecuteCommand(new AddShapeCommand(this, _currentPolyline));
+                {
+                    AddShape(_currentPolyline);
+                    _selectedShapes.Clear();
+                    _selectedShapes.Add(_currentPolyline);
+                }
                 _currentPolyline = null;
                 _isDrawingPolyline = false;
                 InvalidateVisual();
@@ -496,7 +511,11 @@ public class DrawingCanvas : Control
             if (e.Key == Key.Enter)
             {
                 if (_currentPolygon.Points.Count >= 3)
-                    ExecuteCommand(new AddShapeCommand(this, _currentPolygon));
+                {
+                    AddShape(_currentPolygon);
+                    _selectedShapes.Clear();
+                    _selectedShapes.Add(_currentPolygon);
+                }
                 _currentPolygon = null;
                 _isDrawingPolygon = false;
                 InvalidateVisual();
@@ -525,10 +544,7 @@ public class DrawingCanvas : Control
             default: return;
         }
         foreach (var shape in _selectedShapes)
-        {
             shape.Translate(deltaX, deltaY);
-            ExecuteCommand(new MoveShapeCommand(shape, deltaX, deltaY));
-        }
         InvalidateVisual();
         e.Handled = true;
     }
@@ -538,7 +554,7 @@ public class DrawingCanvas : Control
         if (_selectedShapes.Count == 0) return;
         var copy = _selectedShapes[0].Clone();
         copy.Translate(20, 20);
-        ExecuteCommand(new AddShapeCommand(this, copy));
+        AddShape(copy);
         _selectedShapes.Clear();
         _selectedShapes.Add(copy);
     }
@@ -547,7 +563,7 @@ public class DrawingCanvas : Control
     {
         if (_selectedShapes.Count == 0) return;
         foreach (var shape in _selectedShapes.ToList())
-            ExecuteCommand(new DeleteShapeCommand(this, shape));
+            RemoveShape(shape);
         _selectedShapes.Clear();
     }
     
@@ -555,8 +571,8 @@ public class DrawingCanvas : Control
     {
         foreach (var shape in _selectedShapes)
         {
-            var command = new UpdateShapeCommand(shape, shape.StrokeColor, color, shape.StrokeThickness, shape.StrokeThickness, shape.FillColor, shape.FillColor);
-            ExecuteCommand(command);
+            shape.StrokeColor = color;
+            InvalidateVisual();
         }
     }
     
@@ -564,8 +580,8 @@ public class DrawingCanvas : Control
     {
         foreach (var shape in _selectedShapes)
         {
-            var command = new UpdateShapeCommand(shape, shape.StrokeColor, shape.StrokeColor, shape.StrokeThickness, thickness, shape.FillColor, shape.FillColor);
-            ExecuteCommand(command);
+            shape.StrokeThickness = thickness;
+            InvalidateVisual();
         }
     }
     
@@ -573,8 +589,8 @@ public class DrawingCanvas : Control
     {
         foreach (var shape in _selectedShapes)
         {
-            var command = new UpdateShapeCommand(shape, shape.StrokeColor, shape.StrokeColor, shape.StrokeThickness, shape.StrokeThickness, shape.FillColor, color);
-            ExecuteCommand(command);
+            shape.FillColor = color;
+            InvalidateVisual();
         }
     }
     
@@ -584,8 +600,8 @@ public class DrawingCanvas : Control
         foreach (var shape in _selectedShapes)
         {
             var center = new Point(shape.Bounds.X + shape.Bounds.Width / 2, shape.Bounds.Y + shape.Bounds.Height / 2);
-            var command = new RotateShapeCommand(shape, angle, center);
-            ExecuteCommand(command);
+            shape.Rotate(angle, center);
+            InvalidateVisual();
         }
     }
 }
